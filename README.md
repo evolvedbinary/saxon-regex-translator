@@ -1,15 +1,15 @@
-# Saxon Regular Expressions code used by eXist-db
+# Saxon Regular Expressions translator code used by Elemental
 
 [![Java 8](https://img.shields.io/badge/java-8+-blue.svg)](https://adoptopenjdk.net/)
 [![License](https://img.shields.io/badge/license-MPL%201.1-blue.svg)](https://opensource.org/licenses/MPL-1.1)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.exist-db/exist-saxon-regex/badge.svg)](https://search.maven.org/search?q=g:org.exist-db)
+[![Maven Central](https://img.shields.io/maven-central/v/xyz.elemental.fork.saxon/saxon-regex-translator?logo=apachemaven&label=maven+central&color=green)](https://central.sonatype.com/search?namespace=xyz.elemental.fork.saxon)
 
 This is a slight modification of the regular expressions code from the package `net.sf.saxon.functions.regex` of Saxon-HE 9.4.0-9.
 The original code is Copyright Saxonica Limited and is released by them under the [Mozilla Public License 1.1](https://www.mozilla.org/en-US/MPL/1.1/).
 
 Thanks to [Saxonica](https://www.saxonica.com/) for the excellent [Saxon](http://saxon.sourceforge.net/).
 
-This modified code is used by eXist-db in its implementation of the XQuery functions: `fn:analyze-string`, `fn:matches`, `fn:replace`, and `fn:tokenize`.
+This modified code is used by Elemental in its implementation of the XQuery functions: `fn:analyze-string`, `fn:matches`, `fn:replace`, and `fn:tokenize`.
 
 The modifications:
  

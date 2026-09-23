@@ -12,7 +12,7 @@
  * under the License.
  *
  *
- * These files include very slight modifications made by The eXist-db Authors
+ * These files include very slight modifications made by Evolved Binary Ltd
  * and released under the same MPL 1.1 license.
  */
 package org.exist.thirdparty.net.sf.saxon.functions.regex;

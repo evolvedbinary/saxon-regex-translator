@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.exist-db</groupId>
-    <artifactId>exist-saxon-regex</artifactId>
+    <groupId>xyz.elemental.fork.saxon</groupId>
+    <artifactId>saxon-regex-translator</artifactId>
     <version>10.6.e2-SNAPSHOT</version>
 
-    <name>Saxon Regular Expressions</name>
-    <description>Saxon Regular Expressions code used by eXist-db</description>
-    <url>http://www.exist-db.org/</url>
-    <inceptionYear>2020</inceptionYear>
+    <name>Saxon Regular Expressions Translator</name>
+    <description>Saxon Regular Expressions translator code used by Elemental</description>
+    <url>https://www.elemental.xyz</url>
+    <inceptionYear>2026</inceptionYear>
 
     <organization>
-        <name>The eXist-db Project</name>
-        <url>http://www.exist-db.org</url>
+        <name>Evolved Binary</name>
+        <url>https://www.evolvedbinary.com</url>
     </organization>
 
     <licenses>
@@ -24,9 +24,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/exist-db/exist-saxon-regex.git</connection>
-        <developerConnection>scm:git:https://github.com/exist-db/exist-saxon-regex.git</developerConnection>
-        <url>scm:git:https://github.com/exist-db/exist-saxon-regex.git</url>
+        <connection>scm:git:https://github.com/evolvedbinary/saxon-regex-translator.git</connection>
+        <developerConnection>scm:git:https://github.com/evolvedbinary/saxon-regex-translator.git</developerConnection>
+        <url>scm:git:https://github.com/evolvedbinary/saxon-regex-translator.git</url>
       <tag>HEAD</tag>
   </scm>
 
@@ -44,6 +44,15 @@
         </developer>
     </developers>
 
+    <contributors>
+        <contributor>
+            <name>Adam Retter</name>
+            <organization>Evolved Binary</organization>
+            <url>https://www.evolvedbinary.com</url>
+            <email>adam@evolvedbinary.com</email>
+        </contributor>
+    </contributors>
+
     <properties>
         <project.build.source>1.8</project.build.source>
         <project.build.target>1.8</project.build.target>
@@ -51,11 +60,43 @@
     </properties>
 
     <build>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.12.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.2.8</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>3.3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.11.0</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>3.0</version>
+                <version>4.6</version>
                 <configuration>
                     <header>MPL-11-license.template.txt</header>
                     <mapping>
@@ -82,9 +123,33 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.code54.mojo</groupId>
-                <artifactId>buildversion-plugin</artifactId>
-                <version>1.0.3</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.11.0</version>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <sign>true</sign>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.evolvedbinary.maven.plugins</groupId>
+                <artifactId>buildversion-maven-plugin</artifactId>
+                <version>2.0.0</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -97,7 +162,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.16.0</version>
                 <configuration>
                     <source>${project.build.source}</source>
                     <target>${project.build.target}</target>
@@ -107,7 +172,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.5.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -118,8 +183,9 @@
                             <Build-Tag>${build-tag}</Build-Tag>
                             <Git-Commit>${build-commit}</Git-Commit>
                             <Git-Commit-Abbrev>${build-commit-abbrev}</Git-Commit-Abbrev>
+                            <Git-Commit-Timestamp>${build-tstamp}</Git-Commit-Timestamp>
                             <Build-Version>${build-version}</Build-Version>
-                            <Build-Timestamp>${build-tstamp}</Build-Timestamp>
+                            <Build-Timestamp>${project.build.outputTimestamp}</Build-Timestamp>
                             <Source-Repository>${project.scm.connection}</Source-Repository>
                             <Description>${project.description}</Description>
                             <Implementation-URL>${project.url}</Implementation-URL>
@@ -130,7 +196,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -141,8 +206,9 @@
                             <Build-Tag>${build-tag}</Build-Tag>
                             <Git-Commit>${build-commit}</Git-Commit>
                             <Git-Commit-Abbrev>${build-commit-abbrev}</Git-Commit-Abbrev>
+                            <Git-Commit-Timestamp>${build-tstamp}</Git-Commit-Timestamp>
                             <Build-Version>${build-version}</Build-Version>
-                            <Build-Timestamp>${build-tstamp}</Build-Timestamp>
+                            <Build-Timestamp>${project.build.outputTimestamp}</Build-Timestamp>
                             <Source-Repository>${project.scm.connection}</Source-Repository>
                             <Description>${project.description}</Description>
                             <Implementation-URL>${project.url}</Implementation-URL>
@@ -153,7 +219,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -164,8 +229,9 @@
                             <Build-Tag>${build-tag}</Build-Tag>
                             <Git-Commit>${build-commit}</Git-Commit>
                             <Git-Commit-Abbrev>${build-commit-abbrev}</Git-Commit-Abbrev>
+                            <Git-Commit-Timestamp>${build-tstamp}</Git-Commit-Timestamp>
                             <Build-Version>${build-version}</Build-Version>
-                            <Build-Timestamp>${build-tstamp}</Build-Timestamp>
+                            <Build-Timestamp>${project.build.outputTimestamp}</Build-Timestamp>
                             <Source-Repository>${project.scm.connection}</Source-Repository>
                             <Description>${project.description}</Description>
                             <Implementation-URL>${project.url}</Implementation-URL>
@@ -175,42 +241,11 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.0.0-M1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
                 <configuration>
-                    <mavenExecutorId>forked-path</mavenExecutorId> <!-- avoid a bug with GPG plugin hanging http://jira.codehaus.org/browse/MGPG-9 -->
-                    <tagNameFormat>@{project.version}</tagNameFormat>
+                    <tagNameFormat>saxon-regex-translator-@{project.version}</tagNameFormat>
+                    <releaseProfiles>saxon-regex-translator-release</releaseProfiles>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>1.11.2</version>
-                <configuration>
-                    <sign>true</sign>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <useAgent>true</useAgent>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -223,12 +258,64 @@
         </dependency>
     </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <!-- NOTE: this is used from the maven-release-plugin -->
+            <id>saxon-regex-translator-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <deploymentName>${project.artifactId}-${project.version}</deploymentName>
+                            <failOnBuildFailure>true</failOnBuildFailure>
+                            <waitUntil>validated</waitUntil>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
