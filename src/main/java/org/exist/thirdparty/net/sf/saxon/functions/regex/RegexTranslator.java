@@ -17,10 +17,10 @@
  */
 package org.exist.thirdparty.net.sf.saxon.functions.regex;
 
+import net.sf.saxon.str.UnicodeBuilder;
 import net.sf.saxon.z.IntHashSet;
 import net.sf.saxon.serialize.charcode.UTF16CharacterSet;
 import net.sf.saxon.trans.Err;
-import net.sf.saxon.tree.util.FastStringBuffer;
 import net.sf.saxon.value.Whitespace;
 
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public abstract class RegexTranslator {
 
-    protected CharSequence regExp;
+    protected String regExp;
     protected int xmlVersion;
     protected int xsdVersion;
     protected boolean isXPath;
@@ -47,8 +47,8 @@ public abstract class RegexTranslator {
     protected boolean eos = false;
     protected int currentCapture = 0;
     protected IntHashSet captures = new IntHashSet();
-    protected final FastStringBuffer result = new FastStringBuffer(FastStringBuffer.C64);
-    protected List<RegexSyntaxException> warnings = new ArrayList<RegexSyntaxException>();
+    protected final UnicodeBuilder result = new UnicodeBuilder(64);
+    protected List<RegexSyntaxException> warnings = new ArrayList<>();
 
     protected void translateTop() throws RegexSyntaxException {
          translateRegExp();
@@ -128,18 +128,18 @@ public abstract class RegexTranslator {
     }
 
     /*@NotNull*/ protected CharSequence parseQuantExact() throws RegexSyntaxException {
-        FastStringBuffer buf = new FastStringBuffer(FastStringBuffer.C16);
+        final UnicodeBuilder buf = new UnicodeBuilder(16);
         do {
             if ("0123456789".indexOf(curChar) < 0)
                 throw makeException("expected digit in quantifier");
-            buf.append(new char[]{curChar});
+            buf.append(curChar);
             advance();
         } while (curChar != ',' && curChar != '}');
-        return buf;
+        return buf.toString();
     }
 
     protected void copyCurChar() {
-        result.append(new char[]{curChar});
+        result.append(curChar);
         advance();
     }
 
@@ -226,7 +226,7 @@ public abstract class RegexTranslator {
         if (pos < length) {
             curChar = regExp.charAt(pos++);
             if (ignoreWhitespace && !inCharClassExpr) {
-                while (Whitespace.isWhitespace(curChar)) {
+                while (Whitespace.isWhite(curChar)) {
                     advance();
                 }
             }
@@ -261,7 +261,7 @@ public abstract class RegexTranslator {
             curChar = regExp.charAt((--pos)-1);
         }
         if (ignoreWhitespace && !inCharClassExpr) {
-            while (Whitespace.isWhitespace(curChar)) {
+            while (Whitespace.isWhite(curChar)) {
                 recede();
             }
         }
@@ -308,7 +308,7 @@ public abstract class RegexTranslator {
     }
 
     protected static String highSurrogateRanges(List<Range> ranges) {
-        FastStringBuffer highRanges = new FastStringBuffer(ranges.size() * 2);
+        final UnicodeBuilder highRanges = new UnicodeBuilder(ranges.size() * 2);
         for (int i = 0, len = ranges.size(); i < len; i++) {
             Range r = ranges.get(i);
             char min1 = UTF16CharacterSet.highSurrogate(r.getMin());
@@ -322,15 +322,15 @@ public abstract class RegexTranslator {
                 max1--;
             }
             if (max1 >= min1) {
-                highRanges.append(new char[]{min1});
-                highRanges.append(new char[]{max1});
+                highRanges.append(min1);
+                highRanges.append(max1);
             }
         }
         return highRanges.toString();
     }
 
     protected static String lowSurrogateRanges(List<Range> ranges) {
-        FastStringBuffer lowRanges = new FastStringBuffer(ranges.size() * 2);
+        final UnicodeBuilder lowRanges = new UnicodeBuilder(ranges.size() * 2);
         for (int i = 0, len = ranges.size(); i < len; i++) {
             Range r = ranges.get(i);
             char min1 = UTF16CharacterSet.highSurrogate(r.getMin());
@@ -339,20 +339,20 @@ public abstract class RegexTranslator {
             char max2 = UTF16CharacterSet.lowSurrogate(r.getMax());
             if (min1 == max1) {
                 if (min2 != UTF16CharacterSet.SURROGATE2_MIN || max2 != UTF16CharacterSet.SURROGATE2_MAX) {
-                    lowRanges.append(new char[]{min1});
-                    lowRanges.append(new char[]{min2});
-                    lowRanges.append(new char[]{max2});
+                    lowRanges.append(min1);
+                    lowRanges.append(min2);
+                    lowRanges.append(max2);
                 }
             } else {
                 if (min2 != UTF16CharacterSet.SURROGATE2_MIN) {
-                    lowRanges.append(new char[]{min1});
-                    lowRanges.append(new char[]{min2});
-                    lowRanges.append(new char[]{UTF16CharacterSet.SURROGATE2_MAX});
+                    lowRanges.append(min1);
+                    lowRanges.append(min2);
+                    lowRanges.append(UTF16CharacterSet.SURROGATE2_MAX);
                 }
                 if (max2 != UTF16CharacterSet.SURROGATE2_MAX) {
-                    lowRanges.append(new char[]{max1});
-                    lowRanges.append(new char[]{UTF16CharacterSet.SURROGATE2_MIN});
-                    lowRanges.append(new char[]{max2});
+                    lowRanges.append(max1);
+                    lowRanges.append(UTF16CharacterSet.SURROGATE2_MIN);
+                    lowRanges.append(max2);
                 }
             }
         }
@@ -383,5 +383,5 @@ public abstract class RegexTranslator {
 // The Initial Developer of the Original Code is Saxonica Limited.
 // Portions created by ___ are Copyright (C) ___. All rights reserved.
 //
-// Contributor(s):
+// Contributor(s): Evolved Binary Ltd
 //

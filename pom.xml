@@ -3,7 +3,7 @@
 
     <groupId>xyz.elemental.fork.saxon</groupId>
     <artifactId>saxon-regex-translator</artifactId>
-    <version>10.6.e2-SNAPSHOT</version>
+    <version>12.10.e3-SNAPSHOT</version>
 
     <name>Saxon Regular Expressions Translator</name>
     <description>Saxon Regular Expressions translator code used by Elemental</description>
@@ -254,7 +254,7 @@
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
-            <version>10.6</version>
+            <version>12.10</version>
         </dependency>
     </dependencies>
 

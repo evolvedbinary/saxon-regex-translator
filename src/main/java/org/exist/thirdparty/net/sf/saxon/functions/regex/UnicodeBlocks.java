@@ -18,19 +18,20 @@
 package org.exist.thirdparty.net.sf.saxon.functions.regex;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.Version;
 import net.sf.saxon.lib.ParseOptions;
 import net.sf.saxon.lib.Validation;
 import net.sf.saxon.om.AllElementsSpaceStrippingRule;
 import net.sf.saxon.om.AxisInfo;
+import net.sf.saxon.om.NamespaceUri;
 import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.om.TreeInfo;
 import net.sf.saxon.pattern.NameTest;
 import net.sf.saxon.pattern.NodeKindTest;
+import net.sf.saxon.str.UnicodeBuilder;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.tree.iter.AxisIterator;
-import net.sf.saxon.tree.util.FastStringBuffer;
 import net.sf.saxon.type.Type;
-import net.sf.saxon.value.Whitespace;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
@@ -59,8 +60,8 @@ public class UnicodeBlocks {
         return cc;
     }
 
-    private static String normalizeBlockName(String name) {
-        FastStringBuffer fsb = new FastStringBuffer(name.length());
+    private static String normalizeBlockName(final String name) {
+        final UnicodeBuilder fsb = new UnicodeBuilder(name.length());
         for (int i=0; i<name.length(); i++) {
             final char c = name.charAt(i);
             switch (c) {
@@ -68,22 +69,25 @@ public class UnicodeBlocks {
                     // no action
                     break;
                 default:
-                    fsb.append(new char[]{c});
+                    fsb.append(c);
             }
         }
         return fsb.toString();
     }
 
     private synchronized static void readBlocks(Configuration config) throws RegexSyntaxException {
-        blocks = new HashMap<String, JDK15RegexTranslator.CharClass>(250);
-        InputStream in = Configuration.locateResource("unicodeBlocks.xml", new ArrayList<String>(), new ArrayList<ClassLoader>());
+        blocks = new HashMap<>(250);
+        InputStream in = Version.platform.locateResource("unicodeBlocks.xml", new ArrayList<>());
         if (in == null) {
             throw new RegexSyntaxException("Unable to read unicodeBlocks.xml file");
         }
 
-        ParseOptions options = new ParseOptions();
-        options.setSchemaValidationMode(Validation.SKIP);
-        options.setSpaceStrippingRule(AllElementsSpaceStrippingRule.getInstance());
+        final ParseOptions options = new ParseOptions()
+                .withSchemaValidationMode(Validation.SKIP)
+                .withDTDValidationMode(Validation.SKIP)
+                .withSpaceStrippingRule(AllElementsSpaceStrippingRule.getInstance())
+                .withPleaseCloseAfterUse(true);
+
         TreeInfo doc;
         try {
             doc = config.buildDocumentTree(new StreamSource(in, "unicodeBlocks.xml"), options);
@@ -91,13 +95,13 @@ public class UnicodeBlocks {
             throw new RegexSyntaxException("Failed to process unicodeBlocks.xml: " + e.getMessage());
         }
 
-        AxisIterator iter = doc.getRootNode().iterateAxis(AxisInfo.DESCENDANT, new NameTest(Type.ELEMENT, "", "block", config.getNamePool()));
+        AxisIterator iter = doc.getRootNode().iterateAxis(AxisInfo.DESCENDANT, new NameTest(Type.ELEMENT, NamespaceUri.NULL, "block", config.getNamePool()));
         while (true) {
             NodeInfo item = iter.next();
             if (item == null) {
                 break;
             }
-            String blockName = normalizeBlockName(item.getAttributeValue("", "name"));
+            String blockName = normalizeBlockName(item.getAttributeValue(NamespaceUri.NULL, "name"));
             JDK15RegexTranslator.CharClass range = null;
             AxisIterator ranges = item.iterateAxis(AxisInfo.CHILD, NodeKindTest.ELEMENT);
             while (true) {
@@ -105,8 +109,8 @@ public class UnicodeBlocks {
                 if (rangeElement == null) {
                     break;
                 }
-                int from = Integer.parseInt(rangeElement.getAttributeValue("", "from").substring(2), 16);
-                int to = Integer.parseInt(rangeElement.getAttributeValue("", "to").substring(2), 16);
+                int from = Integer.parseInt(rangeElement.getAttributeValue(NamespaceUri.NULL, "from").substring(2), 16);
+                int to = Integer.parseInt(rangeElement.getAttributeValue(NamespaceUri.NULL, "to").substring(2), 16);
                 JDK15RegexTranslator.CharClass cr = new JDK15RegexTranslator.CharRange(from, to);
                 if (range == null) {
                     range = cr;
@@ -134,5 +138,5 @@ public class UnicodeBlocks {
 // The Initial Developer of the Original Code is Saxonica Limited.
 // Portions created by ___ are Copyright (C) ___. All rights reserved.
 //
-// Contributor(s):
+// Contributor(s): Evolved Binary Ltd
 //
